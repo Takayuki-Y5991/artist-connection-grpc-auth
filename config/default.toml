@@ -1,0 +1,22 @@
+# サーバー設定
+[server]
+host = "0.0.0.0"
+port = 50051
+
+# 認証プロバイダー設定
+[auth]
+provider_type = "auth0"  # または "keycloak"
+
+# Auth0設定
+[auth.auth0]
+domain = "your-tenant.auth0.com"
+client_id = "your-client-id"
+client_secret = "your-client-secret"
+audience = "https://your-api-identifier"
+
+# Keycloak設定
+[auth.keycloak]
+realm = "your-realm"
+auth_server_url = "http://localhost:8080/auth"
+client_id = "your-client-id"
+client_secret = "your-client-secret"

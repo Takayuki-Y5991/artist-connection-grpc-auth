@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+    rpc GetToken (GetTokenRequest) returns (GetTokenResponse) {}
+    rpc IntrospectToken (IntrospectTokenRequest) returns (IntrospectTokenResponse) {}
+}
+
+message GetTokenRequest {
+    string grant_type = 1;
+    string client_id = 2;
+    string client_secret = 3; // Confidential Client の場合
+    string code = 4;
+    string redirect_uri = 5;
+    string code_verifier = 6; // PKCE 用
+    string refresh_token = 7;
+}
+
+message GetTokenResponse {
+    string access_token = 1;
+    string id_token = 2;
+    string refresh_token = 3;
+    int32 expires_in = 4;
+    string token_type = 5;
+}
+
+message IntrospectTokenRequest {
+    string token = 1;
+    string token_type_hint = 2; // "access_token" or "refresh_token" (optional)
+}
+
+message IntrospectTokenResponse {
+    bool active = 1;
+    string scope = 2;
+    string client_id = 3;
+    string sub = 4; // ユーザーID
+    string username = 5;
+    string token_type = 6;
+    int64 exp = 7;
+    int64 iat = 8;
+    int64 nbf = 9;
+    string aud = 10;
+    string iss = 11;
+    string jti = 12;
+}

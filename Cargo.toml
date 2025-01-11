@@ -1,0 +1,29 @@
+[package]
+name = "grpc-auth"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# 非起動ランタイム
+tokio = {version = "1.43.0", features = ["full"]}
+# gRPC
+tonic = "0.12.3"
+prost = "0.13.4"
+tower = "0.5.2"
+# 汎用
+async-trait = "0.1.85"
+thiserror = "2.0.11"
+serde = "1.0.217"
+serde_json = "1.0.135"
+# ロギング
+tracing = "0.1.41"
+tracing-subscriber = {version = "0.3.19", features = ["env-filter"]}
+# 認証
+oauth2= {version = "4.4.2", features = ["reqwest"]}
+keycloak = "26.0.700"
+reqwest = {version = "0.12.12", features = ["json"]}
+# 設定
+config = "0.15.5"
+
+[build-dependencies]
+tonic-build = "0.12.3"
