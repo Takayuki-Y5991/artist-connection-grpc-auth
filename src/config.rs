@@ -1,7 +1,7 @@
 use config::{Config, ConfigError, Environment, File};
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize,Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Settings {
     pub server: ServerConfig,
     pub auth: AuthConfig,
@@ -13,13 +13,14 @@ pub struct ServerConfig {
     pub port: u16,
 }
 
-#[derive(Debug, Deserialize,Clone)]
+#[allow(dead_code)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct AuthConfig {
     pub provider_type: ProviderType,
     pub auth0: Option<Auth0Config>,
     pub keycloak: Option<KeycloakConfig>,
 }
-
+#[allow(dead_code)]
 #[derive(Debug, Deserialize, Clone)]
 pub struct Auth0Config {
     pub domain: String,
@@ -27,7 +28,7 @@ pub struct Auth0Config {
     pub client_secret: String,
     pub audience: String,
 }
-
+#[allow(dead_code)]
 #[derive(Debug, Deserialize, Clone)]
 pub struct KeycloakConfig {
     pub realm: String,

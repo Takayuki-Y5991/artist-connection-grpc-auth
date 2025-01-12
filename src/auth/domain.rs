@@ -13,15 +13,15 @@ pub struct TokenResponse {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenInfo {
     pub active: bool,
-    pub scope: Option<String>,      // Vec<Scope>からStringに変換
-    pub client_id: Option<String>,  // ClientIdからStringに変換
+    pub scope: Option<String>,     // Vec<Scope>からStringに変換
+    pub client_id: Option<String>, // ClientIdからStringに変換
     pub sub: Option<String>,
     pub username: Option<String>,
     pub token_type: Option<String>, // TTからStringに変換
     pub exp: Option<i64>,
     pub iat: Option<i64>,
     pub nbf: Option<i64>,
-    pub aud: Option<String>,   // Vec<String>のまま
+    pub aud: Option<String>, // Vec<String>のまま
     pub iss: Option<String>,
     pub jti: Option<String>,
 }

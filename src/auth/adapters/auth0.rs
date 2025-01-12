@@ -1,10 +1,10 @@
 use async_trait::async_trait;
 use oauth2::basic::{BasicTokenIntrospectionResponse, BasicTokenType};
 use oauth2::{
-    basic::BasicClient, reqwest::async_http_client, AccessToken, AuthUrl,
-    AuthorizationCode, ClientId, ClientSecret, EmptyExtraTokenFields,
-    RedirectUrl, RefreshToken, StandardTokenResponse, TokenIntrospectionResponse,
-    TokenResponse as OAuth2TokenResponse, TokenUrl,
+    basic::BasicClient, reqwest::async_http_client, AccessToken, AuthUrl, AuthorizationCode,
+    ClientId, ClientSecret, EmptyExtraTokenFields, RedirectUrl, RefreshToken,
+    StandardTokenResponse, TokenIntrospectionResponse, TokenResponse as OAuth2TokenResponse,
+    TokenUrl,
 };
 use tracing::{error, info};
 
@@ -12,6 +12,7 @@ use crate::auth::domain::{AuthError, AuthResult, TokenInfo, TokenResponse};
 use crate::auth::ports::{AuthProviderFactory, AuthenticationPort};
 use crate::config::Auth0Config;
 
+#[allow(dead_code)]
 pub struct Auth0Client {
     oauth_client: BasicClient,
     config: Auth0Config,
@@ -57,9 +58,7 @@ impl Auth0Client {
         }
     }
 
-    fn convert_introspection_response(
-        response: BasicTokenIntrospectionResponse,
-    ) -> TokenInfo {
+    fn convert_introspection_response(response: BasicTokenIntrospectionResponse) -> TokenInfo {
         TokenInfo {
             active: response.active(),
             scope: response.scopes().map(|scopes| {
@@ -74,7 +73,10 @@ impl Auth0Client {
             exp: response.exp().map(|t| t.timestamp()),
             iat: response.iat().map(|t| t.timestamp()),
             sub: response.sub().map(|s| s.to_string()),
-            aud: response.aud().and_then(|v| v.first()).map(|s| s.to_string()),
+            aud: response
+                .aud()
+                .and_then(|v| v.first())
+                .map(|s| s.to_string()),
             iss: response.iss().map(|s| s.to_string()),
             token_type: response.token_type().map(Self::convert_token_type),
             nbf: response.nbf().map(|t| t.timestamp()),
@@ -158,13 +160,13 @@ impl AuthenticationPort for Auth0Client {
     ) -> AuthResult<TokenResponse> {
         match grant_type {
             "authorization_code" => {
-                let code = code.ok_or_else(|| AuthError::InvalidGrant)?;
-                let redirect_uri = redirect_uri.ok_or_else(|| AuthError::InvalidGrant)?;
+                let code = code.ok_or(AuthError::InvalidGrant)?;
+                let redirect_uri = redirect_uri.ok_or(AuthError::InvalidGrant)?;
                 self.exchange_authentication_token(code, redirect_uri, code_verifier)
                     .await
             }
             "refresh_token" => {
-                let refresh_token = refresh_token.ok_or_else(|| AuthError::InvalidGrant)?;
+                let refresh_token = refresh_token.ok_or(AuthError::InvalidGrant)?;
                 self.exchange_refresh_token(refresh_token).await
             }
             _ => Err(AuthError::InvalidGrant),

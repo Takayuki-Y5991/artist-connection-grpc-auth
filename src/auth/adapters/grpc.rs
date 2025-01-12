@@ -1,8 +1,8 @@
-use std::sync::Arc;
 use config::ConfigError;
-use tonic::{Request, Response, Status};
+use std::sync::Arc;
 use tonic::transport::Server;
-use tracing::{error};
+use tonic::{Request, Response, Status};
+use tracing::error;
 
 use crate::auth::adapters::auth0::Auth0ProviderFactory;
 use crate::auth::domain::AuthError;
@@ -109,11 +109,14 @@ pub async fn start_server(config: &Settings) -> Result<(), Box<dyn std::error::E
     // 設定に基づいて適切なファクトリーを作成
     let auth_client = match config.auth.provider_type {
         ProviderType::Auth0 => {
-            let auth0_config = config.auth.auth0.clone()
-                .ok_or_else(|| Box::new(ConfigError::NotFound("Auth0 configuration not found".into())))?;
+            let auth0_config = config.auth.auth0.clone().ok_or({
+                Box::new(ConfigError::NotFound(
+                    "Auth0 configuration not found".into(),
+                ))
+            })?;
             let factory = Auth0ProviderFactory::new(auth0_config);
             factory.create_provider().await?
-        },
+        }
         ProviderType::Keycloak => {
             // Keycloak用のファクトリーとプロバイダーの実装が必要
             todo!("Keycloak provider not implemented yet")
