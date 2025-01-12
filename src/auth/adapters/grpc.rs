@@ -94,10 +94,10 @@ impl<T: AuthenticationPort + Send + Sync + 'static> AuthService for GrpcAuthServ
             token_type: token_info.token_type.unwrap_or_default(),
             exp: token_info.exp.unwrap_or_default(),
             iat: token_info.iat.unwrap_or_default(),
-            nbf: 0, // Replace with actual value if available
+            nbf: token_info.nbf.unwrap_or_default(),
             aud: token_info.aud.unwrap_or_default(),
             iss: token_info.iss.unwrap_or_default(),
-            jti: "".to_string(), // Replace with actual value if available
+            jti: token_info.jti.unwrap_or_default(),
         }))
     }
 }

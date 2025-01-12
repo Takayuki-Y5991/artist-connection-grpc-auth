@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use oauth2::basic::BasicTokenType;
+use oauth2::basic::{BasicTokenIntrospectionResponse, BasicTokenType};
 use oauth2::{
     basic::BasicClient, reqwest::async_http_client, AccessToken, AuthUrl,
     AuthorizationCode, ClientId, ClientSecret, EmptyExtraTokenFields,
@@ -48,6 +48,40 @@ impl Auth0Client {
             id_token: None,
         }
     }
+    fn convert_token_type(token_type: &BasicTokenType) -> String {
+        match token_type {
+            BasicTokenType::Bearer => "Bearer".to_string(),
+            BasicTokenType::Mac => "Mac".to_string(),
+            // panic の代わりに、未知のトークンタイプの場合はBearerとして扱う
+            _ => "Bearer".to_string(),
+        }
+    }
+
+    fn convert_introspection_response(
+        response: BasicTokenIntrospectionResponse,
+    ) -> TokenInfo {
+        TokenInfo {
+            active: response.active(),
+            scope: response.scopes().map(|scopes| {
+                scopes
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            }),
+            client_id: response.client_id().map(|c| c.to_string()),
+            username: response.username().map(|s| s.to_string()),
+            exp: response.exp().map(|t| t.timestamp()),
+            iat: response.iat().map(|t| t.timestamp()),
+            sub: response.sub().map(|s| s.to_string()),
+            aud: response.aud().and_then(|v| v.first()).map(|s| s.to_string()),
+            iss: response.iss().map(|s| s.to_string()),
+            token_type: response.token_type().map(Self::convert_token_type),
+            nbf: response.nbf().map(|t| t.timestamp()),
+            jti: response.jti().map(|s| s.to_string()),
+        }
+    }
+
     async fn exchange_authentication_token(
         &self,
         code: &str,
@@ -104,33 +138,7 @@ impl Auth0Client {
         let introspection_result = introspection_request.request_async(async_http_client).await;
 
         match introspection_result {
-            Ok(response) => {
-                let token_info = TokenInfo {
-                    active: response.active(),
-                    scope: response.scopes().map(|scopes| {
-                        scopes
-                            .iter()
-                            .map(|s| s.to_string())
-                            .collect::<Vec<_>>()
-                            .join(" ")
-                    }),
-                    client_id: response.client_id().map(|c| c.to_string()),
-                    username: response.username().map(|s| s.to_string()),
-                    exp: response.exp().map(|t| t.timestamp()),
-                    iat: response.iat().map(|t| t.timestamp()),
-                    sub: response.sub().map(|s| s.to_string()),
-                    aud: response.aud().and_then(|v| v.first()).map(|s| s.to_string()),
-                    iss: response.iss().map(|s| s.to_string()),
-                    token_type: response.token_type().map(|t| match t {
-                        BasicTokenType::Bearer => "Bearer".to_string(),
-                        BasicTokenType::Mac => "Mac".to_string(),
-                        _ => panic!(),
-                    }),
-                    nbf: response.nbf().map(|t| t.timestamp()),
-                    jti: response.jti().map(|s| s.to_string()),
-                };
-                Ok(token_info)
-            }
+            Ok(response) => Ok(Self::convert_introspection_response(response)),
             Err(err) => {
                 error!("Token introspection failed: {:?}", err);
                 Err(AuthError::ProviderError(err.to_string()))
