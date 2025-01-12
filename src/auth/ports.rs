@@ -1,5 +1,5 @@
+use crate::auth::domain::{AuthResult, TokenInfo, TokenResponse};
 use async_trait::async_trait;
-use crate::auth::domain::{AuthResult, TokenResponse, TokenInfo};
 
 #[async_trait]
 pub trait AuthenticationPort: Send + Sync {
@@ -12,7 +12,6 @@ pub trait AuthenticationPort: Send + Sync {
         redirect_uri: Option<&str>,
         code_verifier: Option<&str>,
     ) -> AuthResult<TokenResponse>;
-
     /// トークンの検証（イントロスペクション）
     async fn introspect_token(
         &self,
@@ -21,8 +20,6 @@ pub trait AuthenticationPort: Send + Sync {
     ) -> AuthResult<TokenInfo>;
 }
 
-/// 設定の違いを吸収するためのプロバイダーファクトリトレイト
-#[async_trait]
 pub trait AuthProviderFactory {
     type Provider: AuthenticationPort;
 

@@ -13,17 +13,17 @@ pub struct TokenResponse {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenInfo {
     pub active: bool,
-    pub scope: String,
-    pub client_id: String,
-    pub sub: String,
-    pub username: String,
-    pub token_type: String,
-    pub exp: i64,
-    pub iat: i64,
-    pub nbf: i64,
-    pub aud: String,
-    pub iss: String,
-    pub jti: String,
+    pub scope: Option<String>,     // Vec<Scope>からStringに変換
+    pub client_id: Option<String>, // ClientIdからStringに変換
+    pub sub: Option<String>,
+    pub username: Option<String>,
+    pub token_type: Option<String>, // TTからStringに変換
+    pub exp: Option<i64>,
+    pub iat: Option<i64>,
+    pub nbf: Option<i64>,
+    pub aud: Option<String>, // Vec<String>のまま
+    pub iss: Option<String>,
+    pub jti: Option<String>,
 }
 
 #[derive(Debug, Error)]
@@ -45,6 +45,9 @@ pub enum AuthError {
 
     #[error("internal error: {0}")]
     InternalError(String),
+
+    #[error("Redirect URI error: {0}")]
+    RedirectUriError(#[source] oauth2::url::ParseError),
 }
 
 pub type AuthResult<T> = Result<T, AuthError>;
