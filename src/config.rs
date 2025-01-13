@@ -46,8 +46,12 @@ pub enum ProviderType {
 
 impl Settings {
     pub fn new() -> Result<Self, ConfigError> {
+        Self::new_with_config("config/default")
+    }
+
+    pub fn new_with_config(config_path: &str) -> Result<Self, ConfigError> {
         let config = Config::builder()
-            .add_source(File::with_name("config/default"))
+            .add_source(File::with_name(config_path))
             .add_source(Environment::with_prefix("AUTH_SERVICE"))
             .build()?;
 

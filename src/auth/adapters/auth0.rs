@@ -191,6 +191,7 @@ impl Auth0ProviderFactory {
     }
 }
 
+#[async_trait]
 impl AuthProviderFactory for Auth0ProviderFactory {
     type Provider = Auth0Client;
 
