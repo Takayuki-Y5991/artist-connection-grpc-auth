@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct TokenResponse {
     pub access_token: String,
     pub token_type: String,
@@ -10,23 +10,23 @@ pub struct TokenResponse {
     pub id_token: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct TokenInfo {
     pub active: bool,
-    pub scope: Option<String>,     // Vec<Scope>からStringに変換
-    pub client_id: Option<String>, // ClientIdからStringに変換
+    pub scope: Option<String>,
+    pub client_id: Option<String>,
     pub sub: Option<String>,
     pub username: Option<String>,
-    pub token_type: Option<String>, // TTからStringに変換
+    pub token_type: Option<String>,
     pub exp: Option<i64>,
     pub iat: Option<i64>,
     pub nbf: Option<i64>,
-    pub aud: Option<String>, // Vec<String>のまま
+    pub aud: Option<String>,
     pub iss: Option<String>,
     pub jti: Option<String>,
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone, PartialEq, Eq)]
 pub enum AuthError {
     #[error("invalid grant")]
     InvalidGrant,

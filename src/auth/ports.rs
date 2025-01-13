@@ -20,6 +20,7 @@ pub trait AuthenticationPort: Send + Sync {
     ) -> AuthResult<TokenInfo>;
 }
 
+#[async_trait]
 pub trait AuthProviderFactory {
     type Provider: AuthenticationPort;
 
