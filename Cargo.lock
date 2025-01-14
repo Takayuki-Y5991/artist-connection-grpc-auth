@@ -561,6 +561,7 @@ dependencies = [
  "config",
  "mockall",
  "oauth2",
+ "parking_lot",
  "prost",
  "serde",
  "thiserror 2.0.11",
