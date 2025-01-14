@@ -38,6 +38,12 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Get Build Info
+        id: build-info
+        run: |
+          echo "warnings=$(cargo clippy 2>&1 | grep warning | wc -l)" >> $GITHUB_OUTPUT
+          echo "test_count=$(cargo test -- --list | wc -l)" >> $GITHUB_OUTPUT
+
       - name: Check formatting
         uses: actions-rs/cargo@v1
         with:
@@ -55,7 +61,103 @@ jobs:
         with:
           command: build
 
-      - name: Unit　Test
+      - name: Unit Test
         uses: actions-rs/cargo@v1
         with:
           command: test
+
+      - name: Calculate Duration
+        if: always()
+        id: duration
+        run: |
+          end_time=$(date +%s)
+          duration=$((end_time - ${{ github.event.head_commit.timestamp || github.event.pull_request.created_at }}))
+          echo "time=$(date -u -d @${duration} +"%M min %S sec")" >> $GITHUB_OUTPUT
+
+      - name: Notify Slack
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,commit,author,took
+          custom_payload: |
+            {
+              "attachments": [
+                {
+                  "color": "${{ job.status == 'success' && '#36a64f' || job.status == 'failure' && '#dc3545' || '#ff9800' }}",
+                  "blocks": [
+                    {
+                      "type": "header",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "${{ job.status == 'success' && '✅ CI Pipeline Succeeded' || job.status == 'failure' && '❌ CI Pipeline Failed' || '⚠️ CI Pipeline Warning' }}",
+                        "emoji": true
+                      }
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "section",
+                      "fields": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Repository:*\n${{ github.repository }}"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Branch:*\n${{ github.ref_name }}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "fields": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Commit:*\n${{ github.sha }}"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Author:*\n${{ github.actor }}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "fields": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Build Stats:*\nTests: ${{ steps.build-info.outputs.test_count }}\nWarnings: ${{ steps.build-info.outputs.warnings }}"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Duration:*\n${{ steps.duration.outputs.time }}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details on GitHub>"
+                      }
+                    },
+                    {
+                      "type": "context",
+                      "elements": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "Triggered by ${{ github.event_name }} at ${{ github.event.head_commit.timestamp || github.event.pull_request.created_at }}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
