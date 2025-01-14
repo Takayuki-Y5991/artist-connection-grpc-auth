@@ -22,6 +22,7 @@ oauth2= {version = "4.4.2", features = ["reqwest", "rustls-tls"]}
 # 設定
 config = "0.15.5"
 time = "0.3.37"
+parking_lot = "0.12.3"
 
 [build-dependencies]
 tonic-build = "0.12.3"
