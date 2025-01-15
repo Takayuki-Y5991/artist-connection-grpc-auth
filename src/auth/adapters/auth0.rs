@@ -161,7 +161,6 @@ impl AuthenticationPort for Auth0Client {
         redirect_uri: Option<&str>,
         code_verifier: Option<&str>,
     ) -> AuthResult<TokenResponse> {
-
         match grant_type {
             "authorization_code" => {
                 let code = code.ok_or(AuthError::InvalidGrant)?;
