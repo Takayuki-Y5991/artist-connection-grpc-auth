@@ -205,6 +205,7 @@ mod tests {
             client_id: "test_client".to_string(),
             client_secret: "test_secret".to_string(),
             audience: "test_audience".to_string(),
+            force_https: Some(false)
         };
 
         let factory = Auth0ProviderFactory::new(config);

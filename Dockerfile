@@ -1,5 +1,9 @@
-# Dockerfile
 FROM rust:1.84 as builder
+
+# Protocol Buffersのコンパイラをインストール
+RUN apt-get update && \
+    apt-get install -y protobuf-compiler && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 COPY . .

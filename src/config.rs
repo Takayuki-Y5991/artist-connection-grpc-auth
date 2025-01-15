@@ -27,6 +27,7 @@ pub struct Auth0Config {
     pub client_id: String,
     pub client_secret: String,
     pub audience: String,
+    pub force_https: Option<bool>
 }
 #[allow(dead_code)]
 #[derive(Debug, Deserialize, Clone)]

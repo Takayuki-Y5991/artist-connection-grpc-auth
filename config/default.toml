@@ -13,6 +13,7 @@ domain = "your-tenant.auth0.com"
 client_id = "your-client-id"
 client_secret = "your-client-secret"
 audience = "https://your-api-identifier"
+ce_https = false
 
 # Keycloak設定
 [auth.keycloak]
