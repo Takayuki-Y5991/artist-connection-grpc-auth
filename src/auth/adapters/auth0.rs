@@ -56,8 +56,13 @@ impl Auth0Client {
         match token_type {
             BasicTokenType::Bearer => "Bearer".to_string(),
             BasicTokenType::Mac => "Mac".to_string(),
-            // panic の代わりに、未知のトークンタイプの場合はBearerとして扱う
-            _ => "Bearer".to_string(),
+            _ => {
+                tracing::warn!(
+                    "Encountered unknown token type: {:?}, defaulting to Bearer",
+                    token_type
+                );
+                "Bearer".to_string()
+            }
         }
     }
 

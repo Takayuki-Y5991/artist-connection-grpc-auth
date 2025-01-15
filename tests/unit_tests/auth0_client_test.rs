@@ -83,6 +83,7 @@ mod tests {
     use super::*;
     use std::time::Duration;
     use tokio::time::sleep;
+    use tracing_test::traced_test;
 
     #[tokio::test]
     async fn test_exchange_token_authorization_code_success() {
@@ -196,6 +197,17 @@ mod tests {
             introspect_result,
             Err(AuthError::ProviderError(msg)) if msg == "No mock response set"
         ));
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_unknown_token_type_logs_warning() {
+        use oauth2::basic::BasicTokenType;
+        let unknown_token_type = BasicTokenType::Extension("unknown".to_string());
+        let result = Auth0Client::convert_token_type(&unknown_token_type);
+        
+        assert_eq!(result, "Bearer");
+        assert!(logs_contain("Encountered unknown token type: Extension(\"unknown\"), defaulting to Bearer"));
     }
 
     #[tokio::test]
