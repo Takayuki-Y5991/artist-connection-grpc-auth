@@ -238,48 +238,48 @@ jobs:
       - name: Notify Slack
         uses: 8398a7/action-slack@v3
         with:
-          status: custom
-          fields: repo,commit,author,took
-          custom_payload: |
-            {
-              "attachments": [
-                {
-                  "color": "${{ jobs.unit-test.result == 'success' && jobs.integration-test.result == 'success' && '#36a64f' || '#dc3545' }}",
-                  "blocks": [
-                    {
-                      "type": "header",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "${{ jobs.unit-test.result == 'success' && jobs.integration-test.result == 'success' && '✅ CI Pipeline Succeeded' || '❌ CI Pipeline Failed' }}",
-                        "emoji": true
-                      }
-                    },
-                    {
-                      "type": "section",
-                      "fields": [
-                        {
-                          "type": "mrkdwn",
-                          "text": "*Test Results:*\nUnit Tests: ${{ jobs.unit-test.result }}\nIntegration Tests: ${{ jobs.integration-test.result }}"
-                        },
-                        {
-                          "type": "mrkdwn",
-                          "text": "*Build Stats:*\nTests: ${{ steps.build-info.outputs.unit_tests }} unit, ${{ steps.build-info.outputs.integration_tests }} integration\nWarnings: ${{ steps.build-info.outputs.warnings }}"
+            status: custom
+            fields: repo,commit,author,took
+            custom_payload: |
+              {
+                "attachments": [
+                  {
+                    "color": "${{ needs.unit-test.result == 'success' && needs.integration-test.result == 'success' && '#36a64f' || '#dc3545' }}",
+                    "blocks": [
+                      {
+                        "type": "header",
+                        "text": {
+                          "type": "plain_text",
+                          "text": "${{ needs.unit-test.result == 'success' && needs.integration-test.result == 'success' && '✅ CI Pipeline Succeeded' || '❌ CI Pipeline Failed' }}",
+                          "emoji": true
                         }
-                      ]
-                    },
-                    {
-                      "type": "divider"
-                    },
-                    {
-                      "type": "section",
-                      "text": {
-                        "type": "mrkdwn",
-                        "text": "*Duration:* ${{ steps.duration.outputs.time }}"
+                      },
+                      {
+                        "type": "section",
+                        "fields": [
+                          {
+                            "type": "mrkdwn",
+                            "text": "*Test Results:*\nUnit Tests: ${{ needs.unit-test.result }}\nIntegration Tests: ${{ needs.integration-test.result }}"
+                          },
+                          {
+                            "type": "mrkdwn",
+                            "text": "*Build Stats:*\nTests: ${{ steps.build-info.outputs.unit_tests }} unit, ${{ steps.build-info.outputs.integration_tests }} integration\nWarnings: ${{ steps.build-info.outputs.warnings }}"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "divider"
+                      },
+                      {
+                        "type": "section",
+                        "text": {
+                          "type": "mrkdwn",
+                          "text": "*Duration:* ${{ steps.duration.outputs.time }}"
+                        }
                       }
-                    }
-                  ]
-                }
-              ]
-            }
+                    ]
+                  }
+                ]
+              }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
