@@ -20,8 +20,11 @@ pub struct Auth0Client {
 
 impl Auth0Client {
     pub fn new(config: Auth0Config) -> AuthResult<Self> {
-        let auth_url = format!("https://{}/authorize", config.domain);
-        let token_url = format!("https://{}/oauth/token", config.domain);
+        let use_https = config.force_https.unwrap_or(false);
+        let scheme = if use_https { "https" } else { "http" };
+
+        let auth_url = format!("{}://{}/default/authorize", scheme, config.domain);
+        let token_url = format!("{}://{}/default/oauth/token", scheme, config.domain);
 
         let oauth_client = BasicClient::new(
             ClientId::new(config.client_id.clone()),
